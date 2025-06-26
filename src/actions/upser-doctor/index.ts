@@ -1,13 +1,16 @@
+"use server"
+
 import { headers } from "next/headers";
 
 import { db } from "@/db";
 import { doctorsTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { actionClient } from "@/lib/next-safe-action";
 
-import { upserDoctorSchema, UpsertDoctorSchema } from "./schema";
+import { upserDoctorSchema } from "./schema";
 
-export const upsertDoctor = async (data: UpsertDoctorSchema) => {
-    upserDoctorSchema.parse(data);
+export const upsertDoctor = actionClient.schema(upserDoctorSchema).action(async ({ parsedInput }) => {
+
     const session = await auth.api.getSession({
         headers: await headers()
     })
@@ -23,15 +26,14 @@ export const upsertDoctor = async (data: UpsertDoctorSchema) => {
     await db
         .insert(doctorsTable)
         .values({
-            id: data.id,
+            id: parsedInput.id,
             clinicId: session?.user.clinic?.id,
-            ...data,
+            ...parsedInput,
         })
         .onConflictDoUpdate({
             target: [doctorsTable.id],
             set: {
-                ...data
+                ...parsedInput
             },
         });
-
-}
+})
