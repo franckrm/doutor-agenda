@@ -2,6 +2,7 @@
 
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ interface DoctorCardProps {
 }
 
 const DoctorCard = ({ doctor }: DoctorCardProps) => {
+  const [isUpserDoctorDialogOpen, setIsUpserDoctorDialogOpen] = useState(false);
   const doctorInitials = doctor.name
     .split(" ")
     .map((name) => name[0])
@@ -61,11 +63,21 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
       </CardContent>
       <Separator />
       <CardFooter>
-        <Dialog>
+        <Dialog
+          open={isUpserDoctorDialogOpen}
+          onOpenChange={setIsUpserDoctorDialogOpen}
+        >
           <DialogTrigger asChild>
             <Button className="w-full">Ver detalhes</Button>
           </DialogTrigger>
-          <UpserDoctorForm />
+          <UpserDoctorForm
+            doctor={{
+              ...doctor,
+              availableToTime: availability.to.format("HH:mm:ss"),
+              availableFromTime: availability.from.format("HH:mm:ss"),
+            }}
+            onSuccess={() => setIsUpserDoctorDialogOpen(false)}
+          />
         </Dialog>
       </CardFooter>
     </Card>
