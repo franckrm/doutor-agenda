@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Trykker } from "next/font/google";
 import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
@@ -67,6 +68,7 @@ interface UpsertDoctorFormProps {
 const UpserDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
   console.log(doctor);
   const form = useForm<z.infer<typeof formSchema>>({
+    shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: doctor?.name ?? "",
